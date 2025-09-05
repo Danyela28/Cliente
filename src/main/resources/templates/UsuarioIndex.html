@@ -1,0 +1,88 @@
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+    <body layout:fragment="body">
+        <div class="container">
+            <div class="card ">
+                <h5 class="card-header text-bg-dark">Busqueda Rapida</h5>
+                <div class="card-body">
+                    <form method="post" th:action="@{/usuario}" th:object="${usuarioBusqueda}">
+                        <div class="row">
+                            <div class="col-3">
+                                <input type="text" class="form-control" placeholder="Nombre" th:field="*{Nombre}">
+                            </div>
+                            <div class="col-3">
+                                <input type="text" class="form-control" placeholder="Apellido Paterno" th:field="*{ApellidoPaterno}">
+                            </div>
+                            <div class="col-3">
+                                <input type="text" class="form-control" placeholder="Apellido Materno"th:field="*{ApellidoMaterno}">
+                            </div>
+                            <div class="col-2">
+                                
+                                    <select class="form-select" id="inlineFormSelectColonia" aria-label="Default select example">
+                                        <option value="0" selected>Seleccionar Rol...</option>
+                                        <option th:each="rol : ${roles}" th:text="${rol.Nombre}" th:value="${rol.IdRol}" th:field="*{Rol.IdRol}">One</option>
+                                            
+                                        </option>
+                                    </select>
+                            </div>
+      
+                            <div class="col-1">  
+                                <button class="btn btn-outline-dark" type="submit">Buscar</button>
+                            </div>
+                    </form>
+                </div>
+           </div>
+
+                        <hr>
+
+
+
+                        <div class="d-grid gap-2 col-6 mx-auto">
+                            <a th:href="@{/usuario/action/{IdUsuario}(IdUsuario = 0)}" class="btn btn-outline-primary"><i class="bi bi-person-add"></i>Nuevo Usuario</a>
+                        </div>
+                        <hr>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr class="table-dark">
+                                    <th scope="col-1" class="col-sm col-md col-lg col-xl">#</th>
+                                    <th scope="col-2" class="col-sm col-md col-lg col-xl"><em>Nombre</em></th>
+                                    <th scope="col-2" class="col-sm col-md col-lg col-xl"><em>Contacto</em></th>
+                                    <th scope="col-2" class="col-sm col-md col-lg col-xl"><em>Datos Personales</em></th>
+                                    <th scope="col-1" class="col-sm col-md col-lg col-xl"><em>UserName</em></th>
+
+                                    <th scope="col-3" class="col-sm col-md col-lg col-xl"><em>Direccion</em></th>  
+                                    <th scope="col-1" class="col-sm col-md col-lg col-xl"><em>Rol</em></th>
+                                    <th scope="col-1" class="col-sm col-md col-lg col-xl"><em>Foto</em></th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="usuario : ${usuarios}">
+                                    <td><a th:href="@{/usuario/action/{idUsuario}(idUsuario = ${usuario.IdUsuario})}" class="btn btn-outline-warning"><i class="bi bi-pencil-square"></i></a> <a class="btn btn-outline-danger" th:href="@{/usuario/delete/{IdUsuario}(IdUsuario = ${usuario.IdUsuario})}"><i class="bi bi-trash"></i></a></td>
+                                    <td th:text="|${usuario.Nombre} ${usuario.ApellidoPaterno} ${usuario.ApellidoMaterno}|"></td>
+                                    <td th:text="|Tel: ${usuario.Celular} Cel:${usuario.Telefono}|"></td>
+                                    <td th:text="|${usuario.Email}, ${usuario.CURP}, ${usuario.FechaNacimiento}|"></td>
+                                    <td th:text="|${usuario.UserName}|"></td>
+
+                                    <td >
+                                        <ul>
+                                            <li th:each="direccion : ${usuario.Direcciones}" th:text="|${direccion.Calle} ${direccion.NumeroExterior} ${direccion.NumeroInterior} ${direccion.colonia.Nombre} ${direccion.colonia.CodigoPostal} ${direccion.colonia.Municipio.Nombre} ${direccion.colonia.Municipio.Estado.Nombre} ${direccion.colonia.Municipio.Estado.Pais.Nombre}|"></li>
+
+                                        </ul>
+
+                                    </td>
+                                    <td th:each="rol : ${usuario.Rol}" th:text="|${rol.Nombre}|"></td>
+                                    <td>
+                                        <img class="img-fluid" alt="Imagen responsiva" th:src="|${(usuario.Imagen != null) ? 'data:image/*;base64' + usuario.Imagen : 'https://www.seekpng.com/png/detail/514-5147412_default-avatar-icon.png'}|"></td>                        
+
+
+                                </tr>
+                            </tbody>
+
+                        </table>
+                </div>
+                </body>
+                </html>

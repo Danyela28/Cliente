@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <br>
+        <br>
+        
+        <div class="Container">
+            <button id="mostrarFormulario" class="btn btn-primary" onclick="mostrarFormulario()">Mostrar Formulario</button>
+            
+            <div id="botones" class="row" style="display:none">
+                <div clas="btn-group">
+                    <button class="btn btn-success col-md-5" id="btnExcel">Excel</button>
+                    <button class="btn btn-primary col-md-5" id="btnTxt">TXT</button>
+                </div>
+            </div>
+            <div id="formularioArchivo" style="display: none">
+                <br>
+                <form action="/usuario/cargamasiva" method="post" enctype="multipart/form-data">
+                    <input type="file" id="archivo" name="archivo" accept=".xlsx,.txt">
+                    <button type="submit" class="btn btn-success" id="cargaMasiva">Subir Archivo</button>
+                </form>
+            </div>
+            
+            <div th:if="${archivoCorrecto!= null}">
+                <div th:if="${listarErrores.isEmpty()}">
+                    <h4>Archivo correcto: </h4>
+                    <a th:href="@{/usuario/cargamasiva/procesar}" class="btn btn-success">Procesar archivo</a>
+                </div>
+                <div th:unless="${listarErrores.isEmpty()}">
+                    <h4>Archivo incorrecto: </h4>
+                    <table class="table table-responsive table-bordered">
+                        <thead class="table-dark">
+                        <th class="col-2">Linea</th>
+                        <th>Texto</th>
+                        <th>Error</th>
+                        </thead>
+                        <tbody>
+                            <tr th:each="error :${listarErrores}">
+                                <td th:text="${error.linea}"></td> 
+                                <td th:text="${error.dato}"></td> 
+                                <td th:text="${error.mensaje}"></td> 
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            function mostrarFormulario() {
+                document.getElementById("mostrarFormulario").style.display = "none";
+                document.getElementById("botones").style.display = "block";
+            }
+
+            let tipoArchivo = "";
+
+            document.getElementById("btnExcel").addEventListener("click", function () {
+                tipoArchivo = "xlsx"; // Tipo de archivo que se espera
+                document.getElementById("formularioArchivo").style.display = "block";
+                document.getElementById("archivo").setAttribute("accept", ".xlsx"); // Solo archivos Excel
+
+                // Cambiar el botón "Subir Archivo" a verde (btn-success)
+                document.getElementById("cargaMasiva").classList.remove("btn-primary");
+                document.getElementById("cargaMasiva").classList.add("btn-success");
+            });
+
+            document.getElementById("btnTxt").addEventListener("click", function () {
+                tipoArchivo = "txt"; // Tipo de archivo que se espera
+                document.getElementById("formularioArchivo").style.display = "block";
+                document.getElementById("archivo").setAttribute("accept", ".txt"); // Solo archivos TXT
+
+                // Cambiar el botón "Subir Archivo" a azul (btn-primary)
+                document.getElementById("cargaMasiva").classList.remove("btn-success");
+                document.getElementById("cargaMasiva").classList.add("btn-primary");
+            });
+
+            document.getElementById("archivo").addEventListener("change", function () {
+                if (this.files.length > 0) {
+                    var fileName = this.files[0].name;
+                    var fileExtension = fileName.split('.').pop().toLowerCase();
+
+                    if (fileExtension !== tipoArchivo) {
+                        alert("Por favor, seleccione un archivo " + tipoArchivo.toUpperCase() + " válido.");
+                        this.value = "";
+                    }
+                }
+            });
+        </script>
+    
+</html>
