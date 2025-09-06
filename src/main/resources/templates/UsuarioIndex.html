@@ -48,12 +48,13 @@
                             <thead>
                                 <tr class="table-dark">
                                     <th scope="col-1" class="col-sm col-md col-lg col-xl">#</th>
+                                    <th scope="col-1" class="col-sm col-md col-lg col-xl">Estatus</th>
                                     <th scope="col-2" class="col-sm col-md col-lg col-xl"><em>Nombre</em></th>
                                     <th scope="col-2" class="col-sm col-md col-lg col-xl"><em>Contacto</em></th>
                                     <th scope="col-2" class="col-sm col-md col-lg col-xl"><em>Datos Personales</em></th>
                                     <th scope="col-1" class="col-sm col-md col-lg col-xl"><em>UserName</em></th>
 
-                                    <th scope="col-3" class="col-sm col-md col-lg col-xl"><em>Direccion</em></th>  
+                                    <th scope="col-2" class="col-sm col-md col-lg col-xl"><em>Direccion</em></th>  
                                     <th scope="col-1" class="col-sm col-md col-lg col-xl"><em>Rol</em></th>
                                     <th scope="col-1" class="col-sm col-md col-lg col-xl"><em>Foto</em></th>
 
@@ -62,6 +63,12 @@
                             <tbody>
                                 <tr th:each="usuario : ${usuarios}">
                                     <td><a th:href="@{/usuario/action/{idUsuario}(idUsuario = ${usuario.IdUsuario})}" class="btn btn-outline-warning"><i class="bi bi-pencil-square"></i></a> <a class="btn btn-outline-danger" th:href="@{/usuario/delete/{IdUsuario}(IdUsuario = ${usuario.IdUsuario})}"><i class="bi bi-trash"></i></a></td>
+                                    <td> 
+                                        <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault" th:attr="data-id=${usuario.IdUsuario}" th:cheked="${usuario.Status}">
+                                        <label class="form-check-label" for="switch">Default switch checkbox input</label>
+                                        </div>
+                                    </td>
                                     <td th:text="|${usuario.Nombre} ${usuario.ApellidoPaterno} ${usuario.ApellidoMaterno}|"></td>
                                     <td th:text="|Tel: ${usuario.Celular} Cel:${usuario.Telefono}|"></td>
                                     <td th:text="|${usuario.Email}, ${usuario.CURP}, ${usuario.FechaNacimiento}|"></td>
@@ -84,5 +91,14 @@
 
                         </table>
                 </div>
+            <script>
+                $(document).ready(function(){
+                   console.log("hola")
+                    $("#switch").change(function(){
+                    $.ajax({
+                        type: "PATCH",
+                        url: "/127.0.0.0:8081/usuarioapi/estatus/" + $(#)
+                
+            </script>
                 </body>
                 </html>

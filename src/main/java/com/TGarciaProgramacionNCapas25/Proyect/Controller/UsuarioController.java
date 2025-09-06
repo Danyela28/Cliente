@@ -1,9 +1,10 @@
 package com.TGarciaProgramacionNCapas25.Proyect.Controller;
 
-
 import com.TGarciaProgramacionNCapas25.Proyect.ML.Colonia;
 import com.TGarciaProgramacionNCapas25.Proyect.ML.Direccion;
 import com.TGarciaProgramacionNCapas25.Proyect.ML.ErrorCM;
+import com.TGarciaProgramacionNCapas25.Proyect.ML.Estado;
+import com.TGarciaProgramacionNCapas25.Proyect.ML.Municipio;
 import com.TGarciaProgramacionNCapas25.Proyect.ML.Pais;
 import com.TGarciaProgramacionNCapas25.Proyect.ML.Result;
 import com.TGarciaProgramacionNCapas25.Proyect.ML.Rol;
@@ -54,21 +55,21 @@ public class UsuarioController {
 
     @GetMapping
     public String Index(Model model) {
-  
+
         RestTemplate restTemplate = new RestTemplate();
-        
+
         ResponseEntity<Result<List<Usuario>>> responseEntity = restTemplate.exchange("http://localhost:8081/usuarioapi",
                 HttpMethod.GET,
                 HttpEntity.EMPTY,
                 new ParameterizedTypeReference<Result<List<Usuario>>>() {
         });
 
-        if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(200)){
+        if (responseEntity.getStatusCode() == HttpStatusCode.valueOf(200)) {
             model.addAttribute("usuarioBusqueda", new Usuario());
-            
+
             Result result = responseEntity.getBody();
-            
-            if(result.correct){
+
+            if (result.correct) {
                 model.addAttribute("usuarios", result.object);
             } else {
                 model.addAttribute("usuarios", null);
@@ -77,7 +78,7 @@ public class UsuarioController {
 
         return "UsuarioIndex";
     }
-    
+
 //    @PostMapping
 //    public String Index(Model model, @ModelAttribute("usuarioBusqueda")Usuario usuarioBusqueda){
 //        
@@ -93,90 +94,205 @@ public class UsuarioController {
     public String add(Model model, @PathVariable("IdUsuario") int IdUsuario) {
 
         if (IdUsuario == 0) {
-           RestTemplate restTemplate = new RestTemplate();
-        
-         ResponseEntity<Result<List<Rol>>> responseEntity = restTemplate.exchange("http://localhost:8081/rolapi",
-                HttpMethod.GET,
-                HttpEntity.EMPTY,
-                new ParameterizedTypeReference<Result<List<Rol>>>() {
-        });
-        
-         RestTemplate restTemplate = new RestTemplate();
-        
-        ResponseEntity<Result<List<Pais>>> responseEntity = restTemplate.exchange("http://localhost:8081/paisapi",
-                HttpMethod.GET,
-                HttpEntity.EMPTY,
-                new ParameterizedTypeReference<Result<List<Pais>>>() {
-        });
+            RestTemplate restTemplate = new RestTemplate();
 
-            model.addAttribute("roles", result.objects);
-            model.addAttribute("paises", paisJPADAOImplementation.GetAll().objects);
-//            model.addAttribute("colonias", coloniaJPADAOImplementation.ColoniaByMunicipio(IdUsuario).objects);
-           
-            
-//            model.addAttribute("paises", paisDAOImplementation.GetAllPais().objects);
+            ResponseEntity<Result<List<Rol>>> responseRoles = restTemplate.exchange("http://localhost:8081/rolapi",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<List<Rol>>>() {
+            });
+
+            ResponseEntity<Result<List<Pais>>> responsePaises = restTemplate.exchange("http://localhost:8081/paisapi",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<List<Pais>>>() {
+            });
+
+            if (responseRoles.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                Result<List<Rol>> resultRoles = responseRoles.getBody();
+                if (resultRoles != null && resultRoles.correct) {
+                    model.addAttribute("roles", resultRoles.object);
+                }
+            }
+            if (responsePaises.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                Result<List<Pais>> resultPaises = responsePaises.getBody();
+                if (resultPaises != null && resultPaises.correct) {
+                    model.addAttribute("paises", resultPaises.object);
+                }
+            }
+
             model.addAttribute("Usuario", new Usuario());
 
             return "UsuarioForm";
         } else {
-            Result result = usuarioJPADAOImplementation.GetById(IdUsuario);  //DireccionGetByIdUsuario(IdUsuario);
-            
-            if (result.correct) {
-                model.addAttribute("usuario", result.object);
-            } else {
-                model.addAttribute("usuario", null);
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8081/usuarioapi/" + IdUsuario,
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<Usuario>>() {
+            });
+            ResponseEntity<Result<List<Rol>>> responseRoles = restTemplate.exchange("http://localhost:8081/rolapi",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<List<Rol>>>() {
+            });
+
+            ResponseEntity<Result<List<Pais>>> responsePaises = restTemplate.exchange("http://localhost:8081/paisapi",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<List<Pais>>>() {
+            });
+
+            if (responseUsuario.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                Result<Usuario> resultUsuario = responseUsuario.getBody();
+                if (resultUsuario != null && resultUsuario.correct) {
+                    model.addAttribute("usuario", resultUsuario.object);
+                }
             }
+
+            if (responseRoles.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                Result<List<Rol>> resultRoles = responseRoles.getBody();
+                if (resultRoles != null && resultRoles.correct) {
+                    model.addAttribute("roles", resultRoles.object);
+                }
+            }
+            if (responsePaises.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                Result<List<Pais>> resultPaises = responsePaises.getBody();
+                if (resultPaises != null && resultPaises.correct) {
+                    model.addAttribute("paises", resultPaises.object);
+                }
+            }
+
             return "UsuarioDetail";
         }
     }
-//
-//    @GetMapping("formEditable")
-//    public String formEditable(
-//            @RequestParam int IdUsuario,
-//            @RequestParam(required = false) Integer IdDireccion,
-//            Model model) {
-//
-/////---Editar Usuario------------
-//        if (IdDireccion == null) {
-////            Result result = usuarioDAOImplementation.UsuarioGetById(IdUsuario);
-//            Result result = usuarioJPADAOImplementation.GetById(IdUsuario);
-//            Usuario usuario = (Usuario)result.object;
-//            usuario.Direcciones = new ArrayList<>();
-//            usuario.Direcciones.add(new Direccion(-1));
-//            model.addAttribute("Usuario", usuario);
-//        } //-----------Agregar Dirección---------------------
-//        else if (IdDireccion == 0) {
-//
-//            Usuario usuario = new Usuario();
-//            usuario.setIdUsuario(IdUsuario);
-//            model.addAttribute("Usuario", usuario);
-//        
-//
-//        // -----------Editar Dirección---------------------      
-//        } else {
-////        Result result = usuarioDAOImplementation.DireccionGetById(IdDireccion);
-//          Result result = usuarioJPADAOImplementation.GetById(IdUsuario);
-//          Usuario usuario= (Usuario) result.object;
-//          
-//          Result resultD= direccionJPADAOImplementation.GetById(IdDireccion);
-//           if (resultD.correct) {
-//               
-//               Direccion direccion = (Direccion) resultD.object;
-//            
-//        } else {
-//            model.addAttribute("Usuario", new Usuario());
-//        }
-//    }
-//        model.addAttribute(
-//                "paises", paisDAOImplementation.GetAllPais().objects);
-//        model.addAttribute(
-//                "roles", rolDAOImplementation.GetAll().objects);
-//
-//        return "UsuarioForm";
-//    }
-//
+
+    @GetMapping("formEditable")
+    public String formEditable(
+            @RequestParam int IdUsuario,
+            @RequestParam(required = false) Integer IdDireccion,
+            Model model) {
+
+///---Editar Usuario------------
+        if (IdDireccion == null) {
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8081/usuarioapi/" + IdUsuario,
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<Usuario>>() {
+            });
+            Result<Usuario> result = responseUsuario.getBody();
+            if (result != null && result.correct) {
+                Usuario usuario = result.object;
+                if (usuario.getDirecciones() == null) {
+                    usuario.setDirecciones(new ArrayList<>());
+                }
+                usuario.getDirecciones().add(new Direccion(-1));
+            } else {
+                Usuario usuario = new Usuario();
+            }
+            if (responseUsuario.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                Result<Usuario> resultUsuario = responseUsuario.getBody();
+                if (resultUsuario != null && resultUsuario.correct) {
+                    model.addAttribute("usuario", resultUsuario.object);
+                }
+            }
+
+            //-----------Agregar Dirección---------------------
+        } else if (IdDireccion == 0) {
+
+            Usuario usuario = new Usuario();
+            usuario.setIdUsuario(IdUsuario);
+            model.addAttribute("Usuario", usuario);
+
+            // -----------Editar Dirección---------------------      
+        } else {
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<Result<Direccion>> responseDireccion = restTemplate.exchange("http://localhost:8081/direccionoapi/" + IdDireccion,
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<Direccion>>() {
+            });
+            Result<Direccion> resultDireccion = null;
+            if (responseDireccion.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                resultDireccion = responseDireccion.getBody();
+                if (resultDireccion != null && resultDireccion.correct) {
+                    model.addAttribute("usuario", resultDireccion.object); //DUDA*************
+                }
+            }
+
+            ResponseEntity<Result<List<Pais>>> responsePaises = restTemplate.exchange("http://localhost:8081/paisapi",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<List<Pais>>>() {
+            });
+            if (responsePaises.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                Result<List<Pais>> resultPaises = responsePaises.getBody();
+                if (resultPaises != null && resultPaises.correct) {
+                    model.addAttribute("paises", resultPaises.object);
+                }
+            }
+//  ESTADO
+            
+            ResponseEntity<Result<Estado>> responseEstados = restTemplate.exchange("http://localhost:8081/estadoapi/" + resultDireccion.object.colonia.Municipio.Estado.Pais.getIdPais(),
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<Estado>>() {
+            });
+            if (responseEstados.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                Result<Estado> resultEstados = responseEstados.getBody();
+                if (resultEstados != null && resultEstados.correct) {
+                    model.addAttribute("estados", resultEstados.object);
+                }
+            }
+//  MUNICIPIO
+            ResponseEntity<Result<Municipio>> responseMunicipios = restTemplate.exchange("http://localhost:8081/municipioapi/" + resultDireccion.object.colonia.Municipio.Estado.getIdEstado(),
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<Municipio>>() {
+            });
+            if (responseMunicipios.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                Result<Municipio> resultMunicipios = responseMunicipios.getBody();
+                if (resultMunicipios != null && resultMunicipios.correct) {
+                    model.addAttribute("municipios", resultMunicipios.object);
+                }
+            }
+//  COLONIA
+            ResponseEntity<Result<Colonia>> responseColonias = restTemplate.exchange("http://localhost:8081/coloniaapi/" + resultDireccion.object.colonia.Municipio.getIdMunicipio(),
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<Colonia>>() {
+            });
+            if (responseColonias.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                Result<Colonia> resultColonias = responseColonias.getBody();
+                if (resultColonias != null && resultColonias.correct) {
+                    model.addAttribute("colonias", resultColonias.object);
+                }
+            }
+//  ROLES
+            ResponseEntity<Result<List<Rol>>> responseRoles = restTemplate.exchange("http://localhost:8081/rolapi",
+                    HttpMethod.GET,
+                    HttpEntity.EMPTY,
+                    new ParameterizedTypeReference<Result<List<Rol>>>() {
+            });
+            if (responseRoles.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                Result<List<Rol>> resultRoles = responseRoles.getBody();
+                if (resultRoles != null && resultRoles.correct) {
+                    model.addAttribute("roles", resultRoles.object);
+                }
+            }
+        }
+
+            return "UsuarioForm";
+        
+    }
+
 //    @PostMapping("add")
-//    public String Add(@Valid @ModelAttribute("Usuario") Usuario usuario, BindingResult bindingResult,
+//    public String Add(@ModelAttribute("Usuario") Usuario usuario, BindingResult bindingResult,
 //            Model model,
 //            @RequestParam("imagenFile") MultipartFile imagen) {
 //
@@ -185,70 +301,180 @@ public class UsuarioController {
 //            model.addAttribute("Usuario", usuario);
 //            return "UsuarioForm";
 //        } else {
-//            
-//            if(usuario.getIdUsuario()>0 && usuario.Direcciones.get(0).getIdDireccion()>0){
-//                Result result = direccionJPADAOImplementation.UpDate(usuario);
-//       
-//            }else if(usuario.getIdUsuario()>0 && usuario.Direcciones.get(0).getIdDireccion() == -1){
-//                    if (imagen != null && imagen.getOriginalFilename() != "") {
-//                        String nombre = imagen.getOriginalFilename();
-//                        String extension = nombre.split("\\.")[1];
-//                        if (extension.equals("jpg"))
-//                            try {
-//                                byte[] bytes = imagen.getBytes();
-//                                String base64Image = Base64.getEncoder().encodeToString(bytes);
-//                                usuario.setImagen(base64Image);
-//                        } catch (Exception ex) {
-//                            System.out.println("error");
-//                        }
-//                    }
-//                
-//             Result result = usuarioJPADAOImplementation.UpDate(usuario);
-//        
-//            }else if(usuario.getIdUsuario() == 0 && usuario.Direcciones.get(0).getIdDireccion() == 0){
-//                    if (imagen != null && imagen.getOriginalFilename() != "") {
-//                        String nombre = imagen.getOriginalFilename();
-//                        String extension = nombre.split("\\.")[1];
-//                        if (extension.equals("jpg"))
-//                            try {
-//                                byte[] bytes = imagen.getBytes();
-//                                String base64Image = Base64.getEncoder().encodeToString(bytes);
-//                                usuario.setImagen(base64Image);
-//                        } catch (Exception ex) {
-//                            System.out.println("error");
-//                        }
-//                    }
-//                
-//                Result result = usuarioJPADAOImplementation.Add(usuario);
-//        
-//            }else if (usuario.getIdUsuario()>0 && usuario.Direcciones.get(0).getIdDireccion() == 0){
-//            
-//            }
-//            
-////        Result result = usuarioDAOImplementation.UsuarioDireccionAdd(usuario);
-////        Result result = usuarioJPADAOImplementation.Add(usuario);
-//        return "redirect:/usuario";
-//        }
-//    }
 //
-//    //ELIMINAR USUARIO
-//    @GetMapping("delete/{IdUsuario}")
-//    public String Delete(@PathVariable("IdUsuario")int IdUsuario){
-//    
-//        Result result = usuarioJPADAOImplementation.Delete(IdUsuario);
-//    
-//        return "redirec:/UsuarioIndex";
-//    }
-//    
-//    //ELIMINAR DIRECCION
-//    @GetMapping("deleteDirection/{IdDireccion}/{IdUsuario}")
-//    public String Delete (@PathVariable("IdUsuario") int IdUsuario,
-//                           @PathVariable("IdDireccion") int IdDireccion){
-//        
-//        Result result = direccionJPADAOImplementation.Delete(IdDireccion);
-//        
-//        return "redirec:/ UsuarioDetail";
-//    }
+//            if (usuario.getIdUsuario() > 0 && usuario.Direcciones.get(0).getIdDireccion() > 0) {
+//                // Result result = direccionJPADAOImplementation.UpDate(usuario);
+//                RestTemplate restTemplate = new RestTemplate();
+//                ResponseEntity<Result<Direccion>> responseDireccion = restTemplate.exchange("http://localhost:8081/direccionapi/" + IdDireccion,
+//                        HttpMethod.PUT,
+//                        HttpEntity.EMPTY,
+//                        new ParameterizedTypeReference<Result<Direccion>>() {
+//                });
+//                if (responseDireccion.getStatusCode() == HttpStatusCode.valueOf(200)) {
+//                    Result<Direccion> resultDireccion = responseDireccion.getBody();
+//                    if (resultDireccion != null && resultDireccion.correct) {
+//                        model.addAttribute("usuario", resultDireccion.object); //DUDA*************
+//                    }
+//                }
+//
+//            } 
+    @PostMapping("add")
+    public String Add(@ModelAttribute("Usuario") Usuario usuario, BindingResult bindingResult,
+                  Model model,
+                  @RequestParam("imagenFile") MultipartFile imagen) {
+
+    if (bindingResult.hasErrors()) {
+        // Lógica para llenar los países si es necesario
+        model.addAttribute("Usuario", usuario);
+        return "UsuarioForm";
+    } else {    
+        if (usuario.getIdUsuario() > 0 && usuario.getDirecciones() != null && !usuario.getDirecciones().isEmpty()) {
+            int IdDireccion = usuario.getDirecciones().get(0).getIdDireccion();
+
+            RestTemplate restTemplate = new RestTemplate();
+            
+            // Se debe crear un objeto HttpEntity que contenga el cuerpo de la petición (la dirección a actualizar)
+            HttpEntity<Direccion> requestEntity = new HttpEntity<>(usuario.getDirecciones().get(0));
+
+            ResponseEntity<Result<Direccion>> responseDireccion = restTemplate.exchange(
+                "http://localhost:8081/direccionapi/" + IdDireccion,
+                HttpMethod.PUT,
+                requestEntity, 
+                new ParameterizedTypeReference<Result<Direccion>>() {}
+            );
+
+            if (responseDireccion.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                Result<Direccion> resultDireccion = responseDireccion.getBody();
+                if (resultDireccion != null && resultDireccion.correct) {
+                    model.addAttribute("usuario", usuario); 
+                }
+            } else {
+                System.err.println("Error al actualizar la dirección. Código de estado: " + responseDireccion.getStatusCode());
+                model.addAttribute("errorMessage", "Error al actualizar la dirección.");
+            }
+        
+//        }else if (usuario.getIdUsuario() > 0 && usuario.Direcciones.get(0).getIdDireccion() == -1) {
+//                if (imagen != null && imagen.getOriginalFilename() != "") {
+//                    String nombre = imagen.getOriginalFilename();
+//                    String extension = nombre.split("\\.")[1];
+//                    if (extension.equals("jpg"))
+//                            try {
+//                        byte[] bytes = imagen.getBytes();
+//                        String base64Image = Base64.getEncoder().encodeToString(bytes);
+//                        usuario.setImagen(base64Image);
+//                    } catch (Exception ex) {
+//                        System.out.println("error");
+//                    }
+//                }
+//
+//                //Result result = usuarioJPADAOImplementation.UpDate(usuario);
+//                RestTemplate restTemplate = new RestTemplate();
+//
+//                ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8081/usuarioapi/" + IdUsuario,
+//                        HttpMethod.PUT,
+//                        HttpEntity.EMPTY,
+//                        new ParameterizedTypeReference<Result<Usuario>>() {
+//                });
+//                
+//                if (responseUsuario.getStatusCode() == HttpStatusCode.valueOf(200)) {
+//                    Result<Usuario> resultUsuario = responseUsuario.getBody();
+//                    if (resultUsuario != null && resultUsuario.correct) {
+//                        model.addAttribute("usuario", resultUsuario.object);
+//                    }
+//                }
+//
+           } else if (usuario.getIdUsuario() == 0 && usuario.Direcciones.get(0).getIdDireccion() == 0) {
+                if (imagen != null && imagen.getOriginalFilename() != "") {
+                    String nombre = imagen.getOriginalFilename();
+                    String extension = nombre.split("\\.")[1];
+                    if (extension.equals("jpg"))
+                            try {
+                        byte[] bytes = imagen.getBytes();
+                        String base64Image = Base64.getEncoder().encodeToString(bytes);
+                        usuario.setImagen(base64Image);
+                    } catch (Exception ex) {
+                        System.out.println("error");
+                    }
+                }
+
+                //Result result = usuarioJPADAOImplementation.Add(usuario);
+                RestTemplate restTemplate = new RestTemplate();
+                ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8081/usuarioapi",
+                        HttpMethod.POST,
+                        HttpEntity.EMPTY,
+                        new ParameterizedTypeReference<Result<Usuario>>() {
+                });
+                if (responseUsuario.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                    Result<Usuario> resultUsuario = responseUsuario.getBody();
+                    if (resultUsuario != null && resultUsuario.correct) {
+                        model.addAttribute("usuario", resultUsuario.object);
+                    }
+                }
+
+            } else if (usuario.getIdUsuario() > 0 && usuario.Direcciones.get(0).getIdDireccion() == 0) {
+
+                RestTemplate restTemplate = new RestTemplate();
+
+                ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8081/direccionapi",
+                        HttpMethod.POST,
+                        HttpEntity.EMPTY,
+                        new ParameterizedTypeReference<Result<Usuario>>() {
+                });
+                if (responseUsuario.getStatusCode() == HttpStatusCode.valueOf(200)) {
+                    Result<Usuario> result = responseUsuario.getBody();
+                    if (result != null && result.correct) {
+
+                        return "redirect:/usuario";
+                    }
+                }
+            }
+//        Result result = usuarioDAOImplementation.UsuarioDireccionAdd(usuario);
+//        Result result = usuarioJPADAOImplementation.Add(usuario);
+                return "redirect:/usuario";
+            }
+        }
+    
+
+    //ELIMINAR USUARIO
+    @GetMapping("delete/{IdUsuario}")
+    public String Delete(@PathVariable("IdUsuario") int IdUsuario) {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8081/usuarioapi/" + IdUsuario,
+                HttpMethod.DELETE,
+                HttpEntity.EMPTY,
+                new ParameterizedTypeReference<Result<Usuario>>() {
+        });
+        if (responseUsuario.getStatusCode() == HttpStatusCode.valueOf(200)) {
+            return "redirect:/usuario";
+        } else {
+
+            System.out.println("Error al eliminar el usuario. Código de estado: " + responseUsuario.getStatusCode());
+            return "redirect:/Usuario";
+        }
+    }
+
+    //ELIMINAR DIRECCION
+    @GetMapping("deleteDirection/{IdDireccion}/{IdUsuario}")
+    public String Delete(@PathVariable("IdUsuario") int IdUsuario,
+            @PathVariable("IdDireccion") int IdDireccion) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<Result<Direccion>> responseDireccion = restTemplate.exchange("http://localhost:8081/direccionapi/" + IdDireccion,
+                HttpMethod.DELETE,
+                HttpEntity.EMPTY,
+                new ParameterizedTypeReference<Result<Direccion>>() {
+        });
+        if (responseDireccion.getStatusCode() == HttpStatusCode.valueOf(200)) {
+            return "redirect:/usuario";
+        } else {
+
+            System.out.println("Error al eliminar la direccion. Código de estado: " + responseDireccion.getStatusCode());
+            return "redirect:/Usuario";
+        }
+    }
+
 //    
 //
 //    @GetMapping("getEstadosByIdPais/{IdPais}")

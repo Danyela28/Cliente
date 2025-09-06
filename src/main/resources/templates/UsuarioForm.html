@@ -21,7 +21,7 @@
     <body>
         <div class="container">
             <p class="fw-bold text-uppercase fs-2 text-center">REGISTRO DE USUARIO</p>
-            <form method="post" th:object="${Usuario}" th:action="@{/usuario/add}" enctype="multipart/form-data">
+            <form method="post" th:object="${usuario}" th:action="@{/usuario/add}" enctype="multipart/form-data">
 
                 <input type="hidden" th:field="*{IdUsuario}">
                 <input type="hidden" th:field="*{Direcciones[0].IdDireccion}">
