@@ -121,7 +121,10 @@ public class UsuarioController {
                 }
             }
 
-            model.addAttribute("Usuario", new Usuario());
+            Usuario usuario = new Usuario();
+            
+            
+            model.addAttribute("usuario", usuario);
 
             return "UsuarioForm";
         } else {
