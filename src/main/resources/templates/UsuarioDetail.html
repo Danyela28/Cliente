@@ -81,7 +81,7 @@
                 </thead>
                 <tbody>
                     <tr th:each="direccion : ${usuario.Direcciones}">
-                        <td><a th:href="|@{/usuario/formEditable?IdDireccion=}${direccion.IdDireccion}&IdUsuario=${usuario.IdUsuario}|" class="btn btn-outline-warning"><i class="bi bi-pencil-square"></i></a> <a <a th:href="@{/usuario/delete/{IdDireccion}/{IdUsuario}(IdDireccion=${direccion.IdDireccion}, IdUsuario=${usuario.IdUsuario})}" class="btn btn-outline-danger"><i class="bi bi-trash"></i></a></td></td>
+                        <td><a th:href="|@{/usuario/formEditable?IdDireccion=}${direccion.IdDireccion}&IdUsuario=${usuario.IdUsuario}|" class="btn btn-outline-warning"><i class="bi bi-pencil-square"></i></a> <a th:href="@{/usuario/deleteDirection/{IdDireccion}/{IdUsuario}(IdDireccion=${direccion.IdDireccion}, IdUsuario=${usuario.IdUsuario})}" class="btn btn-outline-danger"><i class="bi bi-trash"></i></a></td></td>
                         <td th:text="|${direccion.calle}|"></td>
                         <td th:text="|${direccion.NumeroInterior}|"></td>
                         <td th:text="|${direccion.NumeroExterior}|"></td>
@@ -96,7 +96,7 @@
 
             </table>
             <div class="d-grid gap-2 col-6 mx-auto">
-                <!--<a th:href="|@{/usuario/formEditable?IdDireccion=}0&IdUsuario=${Usuario.IdUsuario}|" class="btn btn-primary"><i class="bi bi-plus-circle-fill"></i>Agregar Direccion</a>-->
+                <a th:href="|@{/usuario/formEditable(IdUsuario=${usuario.IdUsuario}, IdDireccion=0)}|" class="btn btn-primary"><i class="bi bi-plus-circle-fill"></i>Agregar Direccion</a>
             </div>
         </div>
 

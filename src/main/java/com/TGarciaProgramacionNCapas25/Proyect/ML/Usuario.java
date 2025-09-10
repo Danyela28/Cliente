@@ -11,6 +11,7 @@ public class Usuario {
     private String Nombre;
     private String ApellidoMaterno;
     private String ApellidoPaterno;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date FechaNacimiento;
     private String Celular;
     public String fechaStr;

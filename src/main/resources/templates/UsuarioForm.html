@@ -234,7 +234,7 @@
                     <button type="submit" class="btn btn-success mt-4 w-100 fw-bold " th:if="*{IdUsuario == 0 && Direcciones[0].IdDireccion == 0}">Agregar</button> 
                 </div>
                 <div>
-                    <button type="submit" class="btn btn-warning mt-4 w-100 fw-bold " th:if="*{(IdUsuario >0 && Direcciones[0].IdDireccion == -1)}">GUARDAR</button> 
+                    <button type="submit" class="btn btn-warning mt-4 w-100 fw-bold " th:if="*{(IdUsuario >0 && Direcciones[0].IdDireccion == -1) ||(IdUsuario>0 && Direcciones[0].IdDireccion>0)}">GUARDAR</button> 
                 </div>
 
             </form>
@@ -255,18 +255,19 @@
                 }
 
                 $(document).ready(function () {
-                    console.log("Hola, soy el cliente")
+                    console.log($("#paisld").val())
 
                     $("#paisld").change(function () {
+                        
                         $.ajax({
                             type: "GET",
-                            url: "/usuario/getEstadosByIdPais/" + $("#paisld").val(),
+                            url:  "http://localhost:8081/estadoapi/" + $("#paisld").val() ,
                             dataType: 'json',
                             success: function (data, textStatus, jqXHR) {
                                 if (data.correct) {
                                     $("#estadoddl").empty();
                                     $("#estadoddl").append("<option value=0 selected>Selecciona...</option>")
-                                    $.each(data.objects, function (indice, estado) {
+                                    $.each(data.object, function (indice, estado) {
                                         $("#estadoddl").append("<option value=" + estado.idEstado + ">" + estado.nombre + "</option>")
                                     });
                                 } else {
@@ -281,13 +282,13 @@
                     $("#estadoddl").change(function () {
                         $.ajax({
                             type: "GET",
-                            url: "/usuario/getMunicipiosByIdEstado/" + $("#estadoddl").val(),
+                            url:  "http://localhost:8081/municipioapi/" + $("#estadoddl").val(),
                             dataType: 'json',
                             success: function (data, textStatus, jqXHR) {
                                 if (data.correct) {
                                     $("#municipiody").empty();
                                     $("#municipiody").append("<option value=0 selected>Selecciona...</option>")
-                                    $.each(data.objects, function (indice, municipio) {
+                                    $.each(data.object, function (indice, municipio) {
                                         $("#municipiody").append("<option value=" + municipio.idMunicipio + ">" + municipio.nombre + "</option>")
                                     });
                                 } else {
@@ -302,13 +303,13 @@
                     $("#municipiody").change(function () {
                         $.ajax({
                             type: "GET",
-                            url: "/usuario/getColoniasByIdMunicipio/" + $("#municipiody").val(),
+                            url:  "http://localhost:8081/coloniaapi/" + $("#municipiody").val(),
                             dataType: 'json',
                             success: function (data, textStatus, jqXHR) {
                                 if (data.correct) {
                                     $("#coloniaby").empty();
                                     $("#coloniaby").append("<option value=0 selected>Selecciona...</option>")
-                                    $.each(data.objects, function (indice, colonia) {
+                                    $.each(data.object, function (indice, colonia) {
                                         $("#coloniaby").append("<option value=" + colonia.idColonia + ">" + colonia.nombre + " (C.P. " + colonia.codigoPostal + ")</option>");
 
                                     });

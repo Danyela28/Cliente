@@ -5,6 +5,9 @@ public class Estado {
     private int IdEstado;
     private String Nombre;
     public Pais Pais;
+
+    public Estado() {
+    }
     
     
     public int getIdEstado(){
