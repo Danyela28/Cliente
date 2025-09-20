@@ -25,14 +25,20 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -51,9 +57,9 @@ public class UsuarioController {
     @GetMapping
     public String Index(Model model) {
 
-        RestTemplate restTemplate = new RestTemplate();
+            RestTemplate restTemplate = new RestTemplate();
 
-        ResponseEntity<Result<List<Usuario>>> responseEntity = restTemplate.exchange("http://localhost:8081/usuarioapi",
+        ResponseEntity<Result<List<Usuario>>> responseEntity = restTemplate.exchange("http://localhost:8081/api/usuario",
                 HttpMethod.GET,
                 HttpEntity.EMPTY,
                 new ParameterizedTypeReference<Result<List<Usuario>>>() {
@@ -84,7 +90,7 @@ public class UsuarioController {
 //        
 //        return "UsuarioIndex";
 //    }
-//
+
     @GetMapping("/action/{IdUsuario}")
     public String add(Model model, @PathVariable("IdUsuario") int IdUsuario) {
 
@@ -92,13 +98,13 @@ public class UsuarioController {
         if (IdUsuario == 0) {
             RestTemplate restTemplate = new RestTemplate();
 
-            ResponseEntity<Result<List<Rol>>> responseRoles = restTemplate.exchange("http://localhost:8081/rolapi",
+            ResponseEntity<Result<List<Rol>>> responseRoles = restTemplate.exchange("http://localhost:8081/api/Rol",
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<List<Rol>>>() {
             });
 
-            ResponseEntity<Result<List<Pais>>> responsePaises = restTemplate.exchange("http://localhost:8081/paisapi",
+            ResponseEntity<Result<List<Pais>>> responsePaises = restTemplate.exchange("http://localhost:8081/api/pais",
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<List<Pais>>>() {
@@ -127,18 +133,18 @@ public class UsuarioController {
 
             RestTemplate restTemplate = new RestTemplate();
 
-            ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8081/usuarioapi/" + IdUsuario,
+            ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8081/api/usuario/" + IdUsuario,
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<Usuario>>() {
             });
-            ResponseEntity<Result<List<Rol>>> responseRoles = restTemplate.exchange("http://localhost:8081/rolapi",
+            ResponseEntity<Result<List<Rol>>> responseRoles = restTemplate.exchange("http://localhost:8081/api/Rol",
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<List<Rol>>>() {
             });
 
-            ResponseEntity<Result<List<Pais>>> responsePaises = restTemplate.exchange("http://localhost:8081/paisapi",
+            ResponseEntity<Result<List<Pais>>> responsePaises = restTemplate.exchange("http://localhost:8081/api/pais",
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<List<Pais>>>() {
@@ -179,7 +185,7 @@ public class UsuarioController {
 if (IdDireccion == null || IdDireccion == -1) {
     try {
         ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange(
-            "http://localhost:8081/usuarioapi/" + IdUsuario,
+            "http://localhost:8081/api/usuario/" + IdUsuario,
             HttpMethod.GET,
             HttpEntity.EMPTY,
             new ParameterizedTypeReference<Result<Usuario>>() {}
@@ -236,7 +242,7 @@ if (IdDireccion == null || IdDireccion == -1) {
     } else {
         try {
             ResponseEntity<Result<Direccion>> responseDireccion = restTemplate.exchange(
-                "http://localhost:8081/direccionapi/" + IdDireccion,
+                "http://localhost:8081/api/Direccion/" + IdDireccion,
                 HttpMethod.GET,
                 HttpEntity.EMPTY,
                 new ParameterizedTypeReference<Result<Direccion>>() {}
@@ -269,7 +275,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
     try {
         // Cargar países (siempre)
         ResponseEntity<Result<List<Pais>>> responsePaises = restTemplate.exchange(
-            "http://localhost:8081/paisapi",            
+            "http://localhost:8081/api/pais",            
             HttpMethod.GET,
             HttpEntity.EMPTY,
             new ParameterizedTypeReference<Result<List<Pais>>>() {}
@@ -291,7 +297,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
             int idPais = direccion.getColonia().getMunicipio().getEstado().getPais().getIdPais();
             
             ResponseEntity<Result<List<Estado>>> responseEstados = restTemplate.exchange(
-                "http://localhost:8081/estadoapi/" + idPais,
+                "http://localhost:8081/api/Estado/" + idPais,
                 HttpMethod.GET,
                 HttpEntity.EMPTY,
                 new ParameterizedTypeReference<Result<List<Estado>>>() {}
@@ -316,7 +322,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
             int idEstado = direccion.getColonia().getMunicipio().getEstado().getIdEstado();
             
             ResponseEntity<Result<List<Municipio>>> responseMunicipios = restTemplate.exchange(
-                "http://localhost:8081/municipioapi/" + idEstado,
+                "http://localhost:8081/api/Municipio/" + idEstado,
                 HttpMethod.GET,
                 HttpEntity.EMPTY,
                 new ParameterizedTypeReference<Result<List<Municipio>>>() {}
@@ -339,7 +345,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
             int idMunicipio = direccion.getColonia().getMunicipio().getIdMunicipio();
             
             ResponseEntity<Result<List<Colonia>>> responseColonias = restTemplate.exchange(
-                "http://localhost:8081/coloniaapi/" + idMunicipio,
+                "http://localhost:8081/api/colonia/" + idMunicipio,
                 HttpMethod.GET,
                 HttpEntity.EMPTY,
                 new ParameterizedTypeReference<Result<List<Colonia>>>() {}
@@ -357,7 +363,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
 
         // Cargar roles (siempre)
         ResponseEntity<Result<List<Rol>>> responseRoles = restTemplate.exchange(
-            "http://localhost:8081/rolapi",
+            "http://localhost:8081/api/Rol",
             HttpMethod.GET,
             HttpEntity.EMPTY,
             new ParameterizedTypeReference<Result<List<Rol>>>() {}
@@ -391,7 +397,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
         // Lógica para llenar los países si es necesario
         // Cargar países
         ResponseEntity<Result<List<Pais>>> responsePaises = restTemplate.exchange(
-            "http://localhost:8081/paisapi",
+            "http://localhost:8081/api/pais",
             HttpMethod.GET,
             HttpEntity.EMPTY,
             new ParameterizedTypeReference<Result<List<Pais>>>() {}
@@ -405,7 +411,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
 
         // Cargar roles
         ResponseEntity<Result<List<Rol>>> responseRoles = restTemplate.exchange(
-            "http://localhost:8081/rolapi",
+            "http://localhost:8081/api/Rol",
             HttpMethod.GET,
             HttpEntity.EMPTY,
             new ParameterizedTypeReference<Result<List<Rol>>>() {}
@@ -430,7 +436,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
                 int idPais = direccion.getColonia().getMunicipio().getEstado().getPais().getIdPais();
                 
                 ResponseEntity<Result<List<Estado>>> responseEstados = restTemplate.exchange(
-                    "http://localhost:8081/estadoapi/" + idPais,
+                    "http://localhost:8081/api/Estado/" + idPais,
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<List<Estado>>>() {}
@@ -451,7 +457,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
                 int idEstado = direccion.getColonia().getMunicipio().getEstado().getIdEstado();
                 
                 ResponseEntity<Result<List<Municipio>>> responseMunicipios = restTemplate.exchange(
-                    "http://localhost:8081/municipioapi/" + idEstado,
+                    "http://localhost:8081/api/Municipio/" + idEstado,
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<List<Municipio>>>() {}
@@ -471,7 +477,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
                 int idMunicipio = direccion.getColonia().getMunicipio().getIdMunicipio();
                 
                 ResponseEntity<Result<List<Colonia>>> responseColonias = restTemplate.exchange(
-                    "http://localhost:8081/coloniaapi/" + idMunicipio,
+                    "http://localhost:8081/api/colonia/" + idMunicipio,
                     HttpMethod.GET,
                     HttpEntity.EMPTY,
                     new ParameterizedTypeReference<Result<List<Colonia>>>() {}
@@ -499,7 +505,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
             HttpEntity<Direccion> requestEntity = new HttpEntity<>(usuario.getDirecciones().get(0));
 
             ResponseEntity<Result<Direccion>> responseDireccion = restTemplate.exchange(
-                "http://localhost:8081/direccionapi/" + IdDireccion,
+                "http://localhost:8081/api/Direccion/" + IdDireccion,
                 HttpMethod.PUT,
                 requestEntity, 
                 new ParameterizedTypeReference<Result<Direccion>>() {}
@@ -535,7 +541,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
 
             HttpEntity<Usuario> entity = new HttpEntity<>(usuario);
             ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange(
-                "http://localhost:8081/usuarioapi/" + usuario.getIdUsuario(),
+                "http://localhost:8081/api/usuario" + usuario.getIdUsuario(),
                 HttpMethod.PUT,
                 entity,
                 new ParameterizedTypeReference<Result<Usuario>>() {}
@@ -563,7 +569,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
                 }
 
                 HttpEntity<Usuario> entity = new HttpEntity<>(usuario);
-                ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8081/usuarioapi",
+                ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8081/api/usuario",
                         HttpMethod.POST,
                         entity,
                         new ParameterizedTypeReference<Result<Usuario>>() {
@@ -586,7 +592,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
             
             HttpEntity<Usuario> entity = new HttpEntity<>(usuarioConDireccion);
             ResponseEntity<Result<Direccion>> responseDireccion = restTemplate.exchange(
-                "http://localhost:8081/direccionapi",
+                "http://localhost:8081/api/Direccion",
                 HttpMethod.POST,
                 entity,
                 new ParameterizedTypeReference<Result<Direccion>>() {}
@@ -616,7 +622,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
 
         RestTemplate restTemplate = new RestTemplate();
 
-        ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8081/usuarioapi/" + IdUsuario,
+        ResponseEntity<Result<Usuario>> responseUsuario = restTemplate.exchange("http://localhost:8081/api/usuario/" + IdUsuario,
                 HttpMethod.DELETE,
                 HttpEntity.EMPTY,
                 new ParameterizedTypeReference<Result<Usuario>>() {
@@ -636,7 +642,7 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
             @PathVariable("IdDireccion") int IdDireccion) {
         RestTemplate restTemplate = new RestTemplate();
 
-        ResponseEntity<Result<Direccion>> responseDireccion = restTemplate.exchange("http://localhost:8081/direccionapi/" + IdUsuario + "/direcciones/" + IdDireccion,
+        ResponseEntity<Result<Direccion>> responseDireccion = restTemplate.exchange("http://localhost:8081/api/Direccion" + IdUsuario + "/direcciones/" + IdDireccion,
                 HttpMethod.DELETE,
                 HttpEntity.EMPTY,
                 new ParameterizedTypeReference<Result<Direccion>>() {
@@ -649,6 +655,62 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
             return "redirect:/Usuario";
         }
     }
+
+ RestTemplate restTemplate;
+ @GetMapping("cargamasiva")
+    public String CargaMasiva(Model model) {
+        model.addAttribute("listarErrores", new ArrayList<>()); // lista vacía
+        model.addAttribute("archivoCorrecto", null); // no hay archivo aún
+        return "CargaMasiva";
+    }
+
+    
+    @PostMapping("cargamasiva")
+    public String CargaMasiva(@RequestParam("archivo") MultipartFile file, 
+                               Model model, HttpSession session) {
+        try {
+            String urlServidor = "http://localhost:8081/usuarioapi/cargamasiva"; 
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+//            body.add("archivo", new MultipartInputStreamFileResource(
+//                    file.getInputStream(), file.getOriginalFilename()));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            ResponseEntity<Map> response = restTemplate.postForEntity(urlServidor, requestEntity, Map.class);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                model.addAttribute("listarErrores", response.getBody().get("errores") != null ? 
+                        response.getBody().get("errores") : new ArrayList<>());
+                model.addAttribute("archivoCorrecto", response.getBody().get("archivoCorrecto"));
+                session.setAttribute("serverPath", response.getBody().get("path")); 
+            } else {
+                model.addAttribute("listarErrores", new ArrayList<>());
+                model.addAttribute("archivoCorrecto", false);
+                model.addAttribute("mensaje", "Error al procesar archivo en servidor");
+            }
+
+        } catch (Exception e) {
+            model.addAttribute("listarErrores", new ArrayList<>());
+            model.addAttribute("archivoCorrecto", false);
+            model.addAttribute("mensaje", "Error: " + e.getMessage());
+        }
+
+        return "CargaMasiva";
+    }
+}
+//   
+//    @GetMapping("cargamasiva/procesar")
+//    public String CargaMasiva(HttpSession session) {
+//
+//
+//}
+
+
+
 
 //    @GetMapping("cargamasiva")
 //    public String CargaMasiva() {
@@ -862,4 +924,4 @@ private void cargarDatosAdicionales(Model model, Direccion direccion, RestTempla
 //
 //        return errores;
 //    }
-}
+
