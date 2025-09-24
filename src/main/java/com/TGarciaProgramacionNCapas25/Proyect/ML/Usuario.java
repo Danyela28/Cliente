@@ -144,8 +144,6 @@ public class Usuario {
         this.Status = Status;
     }
 
-    
-
     public Rol getRol() {
         return Rol;
     }
@@ -161,13 +159,5 @@ public class Usuario {
     public void setImagen(String Imagen) {
         this.Imagen = Imagen;
     }
-
-    
-
-   
-    
-    
-   
-    
     
 }

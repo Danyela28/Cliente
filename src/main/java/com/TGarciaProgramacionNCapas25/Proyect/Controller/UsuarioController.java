@@ -47,6 +47,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -69,6 +70,8 @@ public class UsuarioController {
             model.addAttribute("usuarioBusqueda", new Usuario());
 
             Result result = responseEntity.getBody();
+
+            System.out.print(responseEntity.getBody());
 
             if (result.correct) {
                 model.addAttribute("usuarios", result.object);
@@ -197,7 +200,6 @@ if (IdDireccion == null || IdDireccion == -1) {
                 Usuario usuario = resultUsuario.object;
                 
                 // REEMPLAZAR todas las direcciones con una que tenga ID = -1
-                // Esto asegura que solo se muestre la sección de usuario
                 usuario.setDirecciones(new ArrayList<>());
                 Direccion direccionUsuario = new Direccion();
                 direccionUsuario.setIdDireccion(-1);
