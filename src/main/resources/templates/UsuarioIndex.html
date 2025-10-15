@@ -5,8 +5,10 @@
 
     <body layout:fragment="body">
         <div class="container">
+            <a href="/usuario/logout" class="btn btn-danger">Cerrar sesión</a>
+            <hr>
             <div class="card ">
-                <h5 class="card-header text-bg-dark">Busqueda Rapida</h5>
+                <h5 sec:authorize="hasAnyRole('Administrador','Editador', 'Estandar')" class="card-header text-bg-dark">Busqueda Rapida</h5>
                 <div class="card-body">
                     <form method="post" th:action="@{/usuario}" th:object="${usuarioBusqueda}">
                         <div class="row">
@@ -41,7 +43,7 @@
 
 
                         <div class="d-grid gap-2 col-6 mx-auto">
-                            <a th:href="@{/usuario/action/{IdUsuario}(IdUsuario = 0)}" class="btn btn-outline-primary"><i class="bi bi-person-add"></i>Nuevo Usuario</a>
+                            <a th:if="${userRole == 'Administrador'}" th:href="@{/usuario/action/{IdUsuario}(IdUsuario = 0)}" class="btn btn-outline-primary"><i class="bi bi-person-add"></i>Nuevo Usuario</a>
                         </div>
                         <hr>
                         <table class="table table-hover">
@@ -62,7 +64,7 @@
                             </thead>
                             <tbody>
                                 <tr th:each="usuario : ${usuarios}">
-                                    <td><a th:href="@{/usuario/action/{idUsuario}(idUsuario = ${usuario.IdUsuario})}" class="btn btn-outline-warning"><i class="bi bi-pencil-square"></i></a> <a class="btn btn-outline-danger" th:href="@{/usuario/delete/{IdUsuario}(IdUsuario = ${usuario.IdUsuario})}"><i class="bi bi-trash"></i></a></td>
+                                    <td><a th:if="${userRole == 'Administrador' or userRole == 'Editador'}" th:href="@{/usuario/action/{idUsuario}(idUsuario = ${usuario.IdUsuario})}" class="btn btn-outline-warning"><i class="bi bi-pencil-square"></i></a> <a th:if="${userRole=='Administrador'}" class="btn btn-outline-danger" th:href="@{/usuario/delete/{IdUsuario}(IdUsuario = ${usuario.IdUsuario})}"><i class="bi bi-trash"></i></a></td>
                                     <td> 
                                         <div class="form-check form-switch">
                                         <input class="form-check-input switch-baja-logica" type="checkbox" role="switch" id="switchCheckDefault_${usuario.IdUsuario}" th:attr="data-id=${usuario.IdUsuario}" th:checked="${usuario.Status}">

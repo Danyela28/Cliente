@@ -2,9 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
-    
+
     <body layout:fragment="body">
         <div class="container">
+
             <form>
                 <fieldset disabled>
                     <legend class="fw-bold text-uppercase fs-2 text-center">Usuario</legend>
@@ -57,7 +58,7 @@
 
 
                 <div class="d-grid gap-2 col-6 mx-auto">
-                    <a class="btn btn-warning" th:href="|@{/usuario/formEditable?IdUsuario=}${usuario.IdUsuario}|"><i class="bi bi-pencil-square"></i>EDITAR USUARIO</a>
+                    <a th:if="${userRole == 'Administrador' or userRole == 'Editador'}" class="btn btn-warning" th:href="|@{/usuario/formEditable?IdUsuario=}${usuario.IdUsuario}|"><i class="bi bi-pencil-square"></i>EDITAR USUARIO</a>
                 </div> 
             </form>
             <hr>
@@ -95,8 +96,16 @@
                 </tbody>
 
             </table>
+            <div class="d-grid gap-2 col-6 mx-auto mt-4">
+                <a th:if="${#strings.equalsIgnoreCase(userRole, 'Lector')}"
+                   href="/usuario/logout"
+                   class="btn btn-danger">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                </a>
+            </div>
+
             <div class="d-grid gap-2 col-6 mx-auto">
-                <a th:href="|@{/usuario/formEditable(IdUsuario=${usuario.IdUsuario}, IdDireccion=0)}|" class="btn btn-primary"><i class="bi bi-plus-circle-fill"></i>Agregar Direccion</a>
+                <a th:if="${userRole == 'Administrador' or userRole == 'Editador'}" th:href="|@{/usuario/formEditable(IdUsuario=${usuario.IdUsuario}, IdDireccion=0)}|" class="btn btn-primary"><i class="bi bi-plus-circle-fill"></i>Agregar Direccion</a>
             </div>
         </div>
 

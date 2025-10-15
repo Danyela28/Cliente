@@ -1,0 +1,288 @@
+
+.<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+                padding: 20px;
+            }
+
+            .login-container {
+                width: 100%;
+                max-width: 400px;
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                overflow: hidden;
+            }
+
+            .login-header {
+                background: linear-gradient(to right, #4776E6, #8E54E9);
+                color: white;
+                padding: 30px 20px;
+                text-align: center;
+            }
+
+            .login-header h1 {
+                font-size: 28px;
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
+
+            .login-header p {
+                opacity: 0.9;
+                font-size: 15px;
+            }
+
+            .login-form {
+                padding: 30px;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+                position: relative;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 500;
+                color: #333;
+            }
+
+            .input-with-icon {
+                position: relative;
+            }
+
+            .input-with-icon i {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #777;
+            }
+
+            .form-control {
+                width: 100%;
+                padding: 14px 14px 14px 45px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                font-size: 16px;
+                transition: all 0.3s;
+            }
+
+            .form-control:focus {
+                outline: none;
+                border-color: #4776E6;
+                box-shadow: 0 0 0 2px rgba(71, 118, 230, 0.2);
+            }
+
+            .btn-login {
+                width: 100%;
+                padding: 14px;
+                background: linear-gradient(to right, #4776E6, #8E54E9);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+
+            .btn-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(71, 118, 230, 0.4);
+            }
+
+            .login-options {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 20px;
+                font-size: 14px;
+            }
+
+            .remember-me {
+                display: flex;
+                align-items: center;
+            }
+
+            .remember-me input {
+                margin-right: 5px;
+            }
+
+            .forgot-password {
+                color: #4776E6;
+                text-decoration: none;
+            }
+
+            .forgot-password:hover {
+                text-decoration: underline;
+            }
+
+            .divider {
+                text-align: center;
+                margin: 25px 0;
+                position: relative;
+                color: #777;
+            }
+
+            .divider::before {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: #ddd;
+                z-index: 1;
+            }
+
+            .divider span {
+                background: white;
+                padding: 0 15px;
+                position: relative;
+                z-index: 2;
+            }
+
+            .social-login {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .social-btn {
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 18px;
+                text-decoration: none;
+                transition: transform 0.2s;
+            }
+
+            .social-btn:hover {
+                transform: scale(1.1);
+            }
+
+            .facebook {
+                background: #3b5998;
+            }
+
+            .google {
+                background: #dd4b39;
+            }
+
+            .twitter {
+                background: #1da1f2;
+            }
+
+            .signup-link {
+                text-align: center;
+                margin-top: 20px;
+                font-size: 14px;
+                color: #555;
+            }
+
+            .signup-link a {
+                color: #4776E6;
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+            .signup-link a:hover {
+                text-decoration: underline;
+            }
+
+            @media (max-width: 480px) {
+                .login-container {
+                    border-radius: 12px;
+                }
+
+                .login-form {
+                    padding: 20px;
+                }
+
+                .login-options {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="login-container">
+            <div class="login-header">
+                <h1>Bienvenido</h1>
+                <p>Inicia sesión en tu cuenta</p>
+            </div>
+            
+            <div th:if="${param.error}" class="error-message">
+                <p th:text="${param.error}" style="color: red; font-weight: bold;"></p>
+            </div>
+            <div th:if="${error}" style="color:red; text-align:center; margin-bottom:10px;">
+                <p th:text="${error}"></p>
+            </div>
+
+            <form method="post" th:action="@{/usuario/Login}" class="login-form">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Ingresa tu usuario o email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Ingresa tu contraseña" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login">Iniciar Sesión</button>
+
+            </form>
+
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const loginForm = document.querySelector('.login-form');
+
+                const inputs = document.querySelectorAll('.form-control');
+                inputs.forEach(input => {
+                    input.addEventListener('focus', function () {
+                        this.parentElement.querySelector('i').style.color = '#4776E6';
+                    });
+
+                    input.addEventListener('blur', function () {
+                        this.parentElement.querySelector('i').style.color = '#777';
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>
