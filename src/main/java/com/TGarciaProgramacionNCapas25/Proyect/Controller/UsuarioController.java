@@ -69,6 +69,68 @@ public class UsuarioController {
         session.invalidate();
         return "redirect:/usuario/Login";
     }
+    
+    @GetMapping("/admin/create")
+    public String adminCreateView(HttpSession session, Model model){
+        String role = (String) session.getAttribute("userRole");
+        String token = (String) session.getAttribute("jwtToken");
+        
+        if(token== null || role == null)
+            return "redirect:/usuario/Login";
+        if(!"ADMINISTRADOR".equalsIgnoreCase(role)&& !"Administrador".equalsIgnoreCase(role))
+            return "redirect:/usuario";
+        model.addAttribute("userRole", role);
+        return "UsuarioAdminCreate";
+    }
+    
+    @PostMapping("/admin/register")
+    public String adminRegister(@RequestParam String nombre,@RequestParam String username,
+                                @RequestParam String email, @RequestParam String password,
+                                HttpSession session, Model model){
+        
+        String role = (String) session.getAttribute("userRole");
+        String token = (String) session.getAttribute("jwtToken");
+        if(token == null || role == null)
+            return "redirect:/usuario/Login";
+        
+        try{
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.set("Authorization", "Bearer " + token);
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+            
+            Map<String, Object> body = new HashMap<>();
+            body.put("nombre", nombre);
+            body.put("username", username);
+            body.put("email", email);
+            body.put("password", password);
+            
+            HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(body, httpHeaders);
+            ResponseEntity<Map> responseEntity = restTemplate.postForEntity("http://localhost:8081/auth/register", 
+                                httpEntity,
+                                Map.class);
+            if(responseEntity.getStatusCode().is2xxSuccessful()){
+                model.addAttribute("OK", "Usuario creado y correo enviado.");
+            }else{
+                model.addAttribute("Error", "No se puede crear el usuario");
+            }
+              
+        }catch(Exception ex){
+            model.addAttribute("Error", "Error: " + ex.getLocalizedMessage());
+        }
+        return "UsuarioAdminCreate";
+    }
+    
+    @GetMapping("/confirmacion-pendiente")
+    public String confirmacionPendiente(HttpSession session, Model model){
+        Integer pendingId = (Integer) session.getAttribute("pendingUserId");
+        if (pendingId == null)
+            return "redirect:/usuario/Login";
+        model.addAttribute("pendingUserId", pendingId);
+        return "ConfirmacionPendiente";
+    }
+    
+    
 
     @PostMapping("/Login")
     public String login(@RequestParam("username") String username,

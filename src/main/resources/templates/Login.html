@@ -1,288 +1,112 @@
 
-.<!DOCTYPE html>
-<html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            }
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body layout:fragment="body">
 
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-                padding: 20px;
-            }
+  <style>
+    :root{ --a:#4776E6; --b:#8E54E9; }
+    .auth-wrap{
+      min-height: calc(100vh - 140px);
+      display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(135deg, rgba(71,118,230,.22), rgba(142,84,233,.22));
+    }
+    .auth-card{
+      width:100%; max-width: 880px; border-radius:18px; overflow:hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,.25);
+      display:grid; grid-template-columns: 5fr 4fr;
+      background: #0b1220;
+    }
+    @media (max-width: 900px){ .auth-card{ grid-template-columns: 1fr; } }
 
-            .login-container {
-                width: 100%;
-                max-width: 400px;
-                background: white;
-                border-radius: 16px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-                overflow: hidden;
-            }
+    .panel-visual{
+      padding:42px; position:relative; color:#e5e7eb;
+      background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      backdrop-filter: blur(10px);
+    }
+    .panel-visual h2{ font-weight:800; letter-spacing:.3px; }
+    .chips{ margin-top:18px; display:flex; flex-wrap:wrap; gap:8px;}
+    .chip{
+      border:1px solid rgba(255,255,255,.18); color:#fff; padding:6px 10px; border-radius:999px;
+      font-size:12px; background: rgba(255,255,255,.08);
+    }
 
-            .login-header {
-                background: linear-gradient(to right, #4776E6, #8E54E9);
-                color: white;
-                padding: 30px 20px;
-                text-align: center;
-            }
+    .panel-form{
+      padding:34px; background: #fff;
+    }
+    .brand{ font-weight:800; color:#111827; }
+    .muted{ color:#6b7280; }
+    .input-icon{ position:relative; }
+    .input-icon i{ position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; }
+    .input-icon input{
+      padding-left:38px;
+    }
+    .btn-primary{
+      background: linear-gradient(90deg, var(--a), var(--b)); border:none;
+    }
+    .ring{ box-shadow: 0 0 0 4px rgba(71,118,230,.15); }
+  </style>
 
-            .login-header h1 {
-                font-size: 28px;
-                margin-bottom: 10px;
-                font-weight: 600;
-            }
+  <div class="auth-wrap">
+    <div class="auth-card">
 
-            .login-header p {
-                opacity: 0.9;
-                font-size: 15px;
-            }
+      <!-- Panel visual (degradado/glass) -->
+      <section class="panel-visual">
+        <h2>Bienvenido a <span class="text-info">CRUD</span></h2>
+        <p class="muted">Ingresa para gestionar tu cuenta y usuarios.</p>
+        <div class="chips">
+          <span class="chip">JWT</span>
+          <span class="chip">Spring Security</span>
+          <span class="chip">Roles</span>
+          <span class="chip">Admin</span>
+        </div>
+      </section>
 
-            .login-form {
-                padding: 30px;
-            }
-
-            .form-group {
-                margin-bottom: 20px;
-                position: relative;
-            }
-
-            .form-group label {
-                display: block;
-                margin-bottom: 8px;
-                font-weight: 500;
-                color: #333;
-            }
-
-            .input-with-icon {
-                position: relative;
-            }
-
-            .input-with-icon i {
-                position: absolute;
-                left: 15px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: #777;
-            }
-
-            .form-control {
-                width: 100%;
-                padding: 14px 14px 14px 45px;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                font-size: 16px;
-                transition: all 0.3s;
-            }
-
-            .form-control:focus {
-                outline: none;
-                border-color: #4776E6;
-                box-shadow: 0 0 0 2px rgba(71, 118, 230, 0.2);
-            }
-
-            .btn-login {
-                width: 100%;
-                padding: 14px;
-                background: linear-gradient(to right, #4776E6, #8E54E9);
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: transform 0.2s, box-shadow 0.2s;
-            }
-
-            .btn-login:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(71, 118, 230, 0.4);
-            }
-
-            .login-options {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 20px;
-                font-size: 14px;
-            }
-
-            .remember-me {
-                display: flex;
-                align-items: center;
-            }
-
-            .remember-me input {
-                margin-right: 5px;
-            }
-
-            .forgot-password {
-                color: #4776E6;
-                text-decoration: none;
-            }
-
-            .forgot-password:hover {
-                text-decoration: underline;
-            }
-
-            .divider {
-                text-align: center;
-                margin: 25px 0;
-                position: relative;
-                color: #777;
-            }
-
-            .divider::before {
-                content: "";
-                position: absolute;
-                top: 50%;
-                left: 0;
-                right: 0;
-                height: 1px;
-                background: #ddd;
-                z-index: 1;
-            }
-
-            .divider span {
-                background: white;
-                padding: 0 15px;
-                position: relative;
-                z-index: 2;
-            }
-
-            .social-login {
-                display: flex;
-                justify-content: center;
-                gap: 15px;
-                margin-bottom: 20px;
-            }
-
-            .social-btn {
-                width: 45px;
-                height: 45px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-size: 18px;
-                text-decoration: none;
-                transition: transform 0.2s;
-            }
-
-            .social-btn:hover {
-                transform: scale(1.1);
-            }
-
-            .facebook {
-                background: #3b5998;
-            }
-
-            .google {
-                background: #dd4b39;
-            }
-
-            .twitter {
-                background: #1da1f2;
-            }
-
-            .signup-link {
-                text-align: center;
-                margin-top: 20px;
-                font-size: 14px;
-                color: #555;
-            }
-
-            .signup-link a {
-                color: #4776E6;
-                text-decoration: none;
-                font-weight: 600;
-            }
-
-            .signup-link a:hover {
-                text-decoration: underline;
-            }
-
-            @media (max-width: 480px) {
-                .login-container {
-                    border-radius: 12px;
-                }
-
-                .login-form {
-                    padding: 20px;
-                }
-
-                .login-options {
-                    flex-direction: column;
-                    gap: 10px;
-                }
-            }
-        </style>
-    </head>
-    <body>
-
-        <div class="login-container">
-            <div class="login-header">
-                <h1>Bienvenido</h1>
-                <p>Inicia sesión en tu cuenta</p>
-            </div>
-            
-            <div th:if="${param.error}" class="error-message">
-                <p th:text="${param.error}" style="color: red; font-weight: bold;"></p>
-            </div>
-            <div th:if="${error}" style="color:red; text-align:center; margin-bottom:10px;">
-                <p th:text="${error}"></p>
-            </div>
-
-            <form method="post" th:action="@{/usuario/Login}" class="login-form">
-                <div class="form-group">
-                    <label for="username">Usuario</label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="username" name="username" class="form-control" placeholder="Ingresa tu usuario o email" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Contraseña</label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Ingresa tu contraseña" required>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-login">Iniciar Sesión</button>
-
-            </form>
-
+      <!-- Panel formulario -->
+      <section class="panel-form">
+        <div class="mb-3">
+          <h4 class="brand mb-0">Iniciar sesión</h4>
+          <small class="muted">Usa tu usuario o correo</small>
         </div>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const loginForm = document.querySelector('.login-form');
+        <!-- Avisos -->
+        <div th:if="${param.activated}" class="alert alert-success py-2">
+          ✅ Tu cuenta fue activada, ahora puedes iniciar sesión.
+        </div>
+        <div th:if="${error}" class="alert alert-danger py-2" th:text="${error}">Error</div>
+        <div th:if="${info}" class="alert alert-info py-2" th:text="${info}"></div>
 
-                const inputs = document.querySelectorAll('.form-control');
-                inputs.forEach(input => {
-                    input.addEventListener('focus', function () {
-                        this.parentElement.querySelector('i').style.color = '#4776E6';
-                    });
+        <form method="post" th:action="@{/usuario/Login}" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label class="form-label">Usuario o Email</label>
+            <div class="input-icon">
+              <i class="bi bi-person"></i>
+              <input name="username" type="text" class="form-control ring" placeholder="usuario o correo" required>
+              <div class="invalid-feedback">Ingresa tu usuario o email.</div>
+            </div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Contraseña</label>
+            <div class="input-icon">
+              <i class="bi bi-lock"></i>
+              <input name="password" type="password" class="form-control ring" placeholder="••••••••" required>
+              <div class="invalid-feedback">Ingresa tu contraseña.</div>
+            </div>
+          </div>
 
-                    input.addEventListener('blur', function () {
-                        this.parentElement.querySelector('i').style.color = '#777';
-                    });
-                });
-            });
-        </script>
-    </body>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="rememberMe">
+              <label class="form-check-label" for="rememberMe">Recordarme</label>
+            </div>
+            <a class="text-decoration-none" th:href="@{/usuario/forgot}">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <button class="btn btn-primary w-100">Iniciar sesión</button>
+        </form>
+      </section>
+    </div>
+  </div>
+
+</body>
 </html>

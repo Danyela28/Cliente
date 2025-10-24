@@ -1,0 +1,81 @@
+
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body layout:fragment="body">
+
+  <style>
+    .spinner {
+      width: 64px; height: 64px; border: 6px solid #e9ecef; border-top-color: #6366f1;
+      border-radius: 50%; animation: spin 1s linear infinite; margin: 24px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .timer { font-size: 1.6rem; font-weight: 700; letter-spacing: 1px; }
+  </style>
+
+  <div class="container py-5">
+    <div class="col-lg-6 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-body text-center p-4">
+          <h4 class="mb-2">Confirma tu correo</h4>
+          <p class="text-muted">
+            Te enviamos un enlace de verificación. Mantén esta pestaña abierta.
+          </p>
+
+          <div class="spinner"></div>
+          <div class="timer mb-2"><span id="mm">02</span>:<span id="ss">00</span></div>
+          <p class="text-muted small">Protegido con cookie temporal (2 minutos).</p>
+
+          <div class="d-grid gap-2 mt-3">
+            <button id="btnCheck" class="btn btn-primary">Ya confirmé mi correo</button>
+            <button id="btnResend" class="btn btn-outline-secondary">Reenviar correo</button>
+          </div>
+
+          <div id="msg" class="mt-3 small text-muted"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    (function(){
+      const pendingUserId = /*[[${pendingUserId}]]*/ 0;
+
+      // 1) Crear cookie EV (HttpOnly, 2 min)
+      fetch('http://localhost:8081/auth/prepare-verify', { method:'GET', credentials:'include' })
+        .then(()=> { document.getElementById('msg').textContent = 'Cookie creada. Tienes 2 minutos para confirmar.'; })
+        .catch(()=> { document.getElementById('msg').textContent = 'No se pudo crear cookie. Recarga la página.'; });
+
+      // 2) Contador 2:00
+      let total=120;
+      const mm = document.getElementById('mm'), ss = document.getElementById('ss');
+      const tick = ()=>{
+        const m = Math.floor(total/60), s = total%60;
+        mm.textContent = String(m).padStart(2,'0');
+        ss.textContent = String(s).padStart(2,'0');
+        if(total>0){ total--; setTimeout(tick, 1000); }
+        else{ document.getElementById('msg').textContent = 'Tiempo agotado. Regenera cookie recargando esta página.'; }
+      }; tick();
+
+      // 3) Verificar estado (palomita/redirect si ya está ACTIVO)
+      document.getElementById('btnCheck').addEventListener('click', async ()=>{
+        const res = await fetch('http://localhost:8081/api/usuario/'+pendingUserId+'/estado', { credentials:'include' });
+        if(!res.ok) return alert('No se pudo verificar estado.');
+        const data = await res.json();
+        if (String(data.estado).toUpperCase() === 'ACTIVO') {
+          window.location.href = 'http://localhost:8080/usuario/Login?activated=true';
+        } else {
+          alert('Aún no está confirmado. Abre el enlace del correo.');
+        }
+      });
+
+      // 4) Reenviar correo (opcional)
+      document.getElementById('btnResend').addEventListener('click', async ()=>{
+        const res = await fetch('http://localhost:8081/auth/resend?userId='+pendingUserId, { credentials:'include' });
+        document.getElementById('msg').textContent = res.ok ? 'Reenviamos el correo. Revisa tu bandeja.' : 'No se pudo reenviar.';
+      });
+    })();
+  </script>
+</body>
+</html>
+
